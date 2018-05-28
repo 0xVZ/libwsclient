@@ -137,5 +137,10 @@ void libwsclient_close(wsclient *c);
 int libwsclient_helper_socket(wsclient *c, const char *path);
 void *libwsclient_helper_socket_thread(void *ptr);
 
+void libwsclient_onopen(wsclient *client, int (*cb)(wsclient *c));
+void libwsclient_onmessage(wsclient *client, int (*cb)(wsclient *c, wsclient_message *msg));
+void libwsclient_onerror(wsclient *client, int (*cb)(wsclient *c, wsclient_error *err));
+void libwsclient_onclose(wsclient *client, int (*cb)(wsclient *c));
+int libwsclient_send(wsclient *client, char *strdata);
 
 #endif /* WSCLIENT_H_ */
