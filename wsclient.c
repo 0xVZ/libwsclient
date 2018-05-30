@@ -378,7 +378,7 @@ int libwsclient_open_connection(const char *host, const char *port) {
 	}
 
 	for(p = servinfo; p != NULL; p = p->ai_next) {
-		if((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+		if((sockfd = socket(p->ai_family, p->ai_socktype | SOCK_CLOEXEC, p->ai_protocol)) == -1) {
 			continue;
 		}
 		if(connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
@@ -405,7 +405,7 @@ int libwsclient_helper_socket(wsclient *c, const char *path) {
 	strncpy(c->helper_sa.sun_path, path, sizeof(c->helper_sa.sun_path) - 1);
 	unlink(c->helper_sa.sun_path);
 	len = strlen(c->helper_sa.sun_path) + sizeof(c->helper_sa.sun_family);
-	sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+	sockfd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if(sockfd == -1) {
 		fprintf(stderr, "Error creating UNIX socket.\n");
 		return WS_HELPER_CREATE_SOCK_ERR;
