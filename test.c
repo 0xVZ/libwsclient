@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include <wsclient/wsclient.h>
+#include "wsclient.h"
 
 int onclose(wsclient *c) {
 	fprintf(stderr, "onclose called: %d\n", c->sockfd);
@@ -26,13 +26,13 @@ int onmessage(wsclient *c, wsclient_message *msg) {
 
 int onopen(wsclient *c) {
 	fprintf(stderr, "onopen called: %d\n", c->sockfd);
-	libwsclient_send(c, "Hello onopen");
+	libwsclient_send(c, "Hello test123");
 	return 0;
 }
 
 int main(int argc, char **argv) {
 	//Initialize new wsclient * using specified URI
-	wsclient *client = libwsclient_new("ws://echo.websocket.org");
+	wsclient *client = libwsclient_new("wss://demo.piesocket.com/v3/channel_123");
 	if(!client) {
 		fprintf(stderr, "Unable to initialize new WS client.\n");
 		exit(1);
@@ -42,10 +42,7 @@ int main(int argc, char **argv) {
 	libwsclient_onmessage(client, &onmessage);
 	libwsclient_onerror(client, &onerror);
 	libwsclient_onclose(client, &onclose);
-	//bind helper UNIX socket to "test.sock"
-	//One can then use netcat (nc) to send data to the websocket server end on behalf of the client, like so:
-	// $> echo -n "some data that will be echoed by echo.websocket.org" | nc -U test.sock
-	libwsclient_helper_socket(client, "test.sock");
+
 	//starts run thread.
 	libwsclient_run(client);
 	//blocks until run thread for client is done.

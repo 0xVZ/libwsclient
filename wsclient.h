@@ -8,14 +8,9 @@
 #include <sys/un.h>
 #include <stddef.h>
 
-#include "config.h"
-
-
-#ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/crypto.h>
-#endif
 
 
 
@@ -109,10 +104,8 @@ typedef struct _wsclient {
 	wsclient_frame *current_frame;
 	struct sockaddr_un helper_sa;
 	int helper_sock;
-#ifdef HAVE_LIBSSL
 	SSL_CTX *ssl_ctx;
 	SSL *ssl;
-#endif
 } wsclient;
 
 

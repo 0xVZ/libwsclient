@@ -16,7 +16,6 @@
 #include <pthread.h>
 
 #include "wsclient.h"
-#include "config.h"
 #include "sha1.h"
 
 //Define errors
@@ -44,6 +43,8 @@ char *errors[] = {
 };
 
 int libwsclient_flags; //global flags variable
+
+int libwsclient_send_fragment(wsclient *client, char *strdata, int len, int flags);
 
 void libwsclient_run(wsclient *c) {
 	if(c->flags & CLIENT_CONNECTING) {
@@ -629,7 +630,6 @@ void *libwsclient_handshake_thread(void *ptr) {
 		return NULL;
 	}
 
-#ifdef HAVE_LIBSSL
 	if(client->flags & CLIENT_IS_SSL) {
 		if((libwsclient_flags & WS_FLAGS_SSL_INIT) == 0) {
 			SSL_library_init();
@@ -641,7 +641,6 @@ void *libwsclient_handshake_thread(void *ptr) {
 		SSL_set_fd(client->ssl, sockfd);
 		SSL_connect(client->ssl);
 	}
-#endif
 
 	pthread_mutex_lock(&client->lock);
 	client->sockfd = sockfd;
@@ -1113,27 +1112,19 @@ int libwsclient_send(wsclient *client, char *strdata)  {
 }
 
 ssize_t _libwsclient_read(wsclient *c, void *buf, size_t length) {
-#ifdef HAVE_LIBSSL
 	if(c->flags & CLIENT_IS_SSL) {
 		return (ssize_t)SSL_read(c->ssl, buf, length);
 	} else {
-#endif
 		return recv(c->sockfd, buf, length, 0);
-#ifdef HAVE_LIBSSL
 	}
-#endif
 }
 
 ssize_t _libwsclient_write(wsclient *c, const void *buf, size_t length) {
-#ifdef HAVE_LIBSSL
 	if(c->flags & CLIENT_IS_SSL) {
 		return (ssize_t)SSL_write(c->ssl, buf, length);
 	} else {
-#endif
 		return send(c->sockfd, buf, length, 0);
-#ifdef HAVE_LIBSSL
 	}
-#endif
 }
 
 

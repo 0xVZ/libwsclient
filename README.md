@@ -13,12 +13,6 @@ certain events occur (onopen, onmessage, onclose, onerror).
 Your best bet for getting started is to look at test.c which shows
 how to connect to an echo server using libwsclient calls.
 
-Also, to install:
-
-./autogen.sh
-
-./configure && make && sudo make install
-
-Then link your C program against wsclient: 'gcc -g -O2 -o test test.c -lwsclient'
-
+Also, to build:
+gcc wsclient.c base64.c sha1.c test.c -lssl -lcrypto -lpthread -o test
 
