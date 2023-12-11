@@ -12,7 +12,7 @@ int onclose(wsclient *c) {
 
 int onerror(wsclient *c, wsclient_error *err) {
 	fprintf(stderr, "onerror: (%d): %s\n", err->code, err->str);
-	if(err->extra_code) {
+	if (err->extra_code) {
 		errno = err->extra_code;
 		perror("recv");
 	}
@@ -33,7 +33,7 @@ int onopen(wsclient *c) {
 int main(int argc, char **argv) {
 	//Initialize new wsclient * using specified URI
 	wsclient *client = libwsclient_new("wss://demo.piesocket.com/v3/channel_123");
-	if(!client) {
+	if (!client) {
 		fprintf(stderr, "Unable to initialize new WS client.\n");
 		exit(1);
 	}

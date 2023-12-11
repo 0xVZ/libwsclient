@@ -1,8 +1,11 @@
 libwsclient
 ===========
 
-
 WebSocket client library for C
+
+## IMPORTANT NOTE
+
+Although this library supports secure websockets, for simplicity the code that verifies the server's response to **Sec-WebSocket-Key** was removed. The library works exactly the same but it is **not recommended to send or receive sensitive information**.
 
 This library abstracts away WebSocket protocol framing for
 client connections.  It aims to provide a *somewhat* similar

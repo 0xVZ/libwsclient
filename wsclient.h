@@ -13,9 +13,7 @@
 #include <openssl/crypto.h>
 
 
-
 #define FRAME_CHUNK_LENGTH 1024
-#define HELPER_RECV_BUF_SIZE 1024
 
 #define CLIENT_IS_SSL (1 << 0)
 #define CLIENT_CONNECTING (1 << 1)
@@ -53,14 +51,7 @@
 #define WS_SEND_SEND_ERR -12
 #define WS_HANDSHAKE_REMOTE_CLOSED_ERR -13
 #define WS_HANDSHAKE_RECV_ERR -14
-#define WS_HANDSHAKE_BAD_STATUS_ERR -15
-#define WS_HANDSHAKE_NO_UPGRADE_ERR -16
-#define WS_HANDSHAKE_NO_CONNECTION_ERR -17
-#define WS_HANDSHAKE_BAD_ACCEPT_ERR -18
-#define WS_HELPER_ALREADY_BOUND_ERR -19
-#define WS_HELPER_CREATE_SOCK_ERR -20
-#define WS_HELPER_BIND_ERR -21
-#define WS_HELPER_LISTEN_ERR -22
+
 
 typedef struct _wsclient_frame {
 	unsigned int fin;
@@ -89,7 +80,6 @@ typedef struct _wsclient_error {
 } wsclient_error;
 
 typedef struct _wsclient {
-	pthread_t helper_thread;
 	pthread_t handshake_thread;
 	pthread_t run_thread;
 	pthread_mutex_t lock;
@@ -102,33 +92,25 @@ typedef struct _wsclient {
 	int (*onerror)(struct _wsclient *, wsclient_error *err);
 	int (*onmessage)(struct _wsclient *, wsclient_message *msg);
 	wsclient_frame *current_frame;
-	struct sockaddr_un helper_sa;
-	int helper_sock;
 	SSL_CTX *ssl_ctx;
 	SSL *ssl;
 } wsclient;
 
-
-//Function defs
 
 wsclient *libwsclient_new(const char *URI);
 wsclient_error *libwsclient_new_error(int errcode);
 ssize_t _libwsclient_read(wsclient *c, void *buf, size_t length);
 ssize_t _libwsclient_write(wsclient *c, const void *buf, size_t length);
 int libwsclient_open_connection(const char *host, const char *port);
-int stricmp(const char *s1, const char *s2);
 int libwsclient_complete_frame(wsclient *c, wsclient_frame *frame);
 void libwsclient_handle_control_frame(wsclient *c, wsclient_frame *ctl_frame);
 void libwsclient_run(wsclient *c);
 void libwsclient_finish(wsclient *client);
 void *libwsclient_run_thread(void *ptr);
 void *libwsclient_handshake_thread(void *ptr);
-void libwsclient_cleanup_frames(wsclient_frame *first);
 void libwsclient_in_data(wsclient *c, char in);
 void libwsclient_dispatch_message(wsclient *c, wsclient_frame *current);
 void libwsclient_close(wsclient *c);
-int libwsclient_helper_socket(wsclient *c, const char *path);
-void *libwsclient_helper_socket_thread(void *ptr);
 
 void libwsclient_onopen(wsclient *client, int (*cb)(wsclient *c));
 void libwsclient_onmessage(wsclient *client, int (*cb)(wsclient *c, wsclient_message *msg));
